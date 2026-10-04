@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ganancia Fácil</title>
+<style>
+  *{box-sizing:border-box} body{margin:0;font-family:Arial,sans-serif;background:#f5f5f5;color:#222}
+  .wrap{max-width:520px;margin:0 auto;padding:24px 16px}
+  .card{background:white;border-radius:18px;padding:24px;box-shadow:0 4px 18px rgba(0,0,0,.08)}
+  h1{margin:0 0 6px;font-size:28px;text-align:center}.sub{text-align:center;color:#666;margin:0 0 24px}
+  label{display:block;font-weight:700;margin:15px 0 7px}
+  input{width:100%;padding:13px;border:1px solid #ccc;border-radius:10px;font-size:17px}
+  button{width:100%;margin-top:22px;padding:14px;border:0;border-radius:10px;background:#222;color:white;font-size:17px;font-weight:700;cursor:pointer}
+  .results{margin-top:22px;border-top:1px solid #eee;padding-top:18px}
+  .row{display:flex;justify-content:space-between;padding:10px 0;font-size:17px}
+  .main{font-size:22px;font-weight:800}.note{color:#666;font-size:13px;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>💰 Ganancia Fácil</h1>
+    <p class="sub">Calculá cuánto ganás realmente con cada venta.</p>
+
+    <label for="buy">Precio de compra ($)</label>
+    <input id="buy" type="number" min="0" step="0.01" placeholder="10000">
+
+    <label for="extra">Gastos adicionales ($)</label>
+    <input id="extra" type="number" min="0" step="0.01" placeholder="1000">
+
+    <label for="fee">Comisión (%)</label>
+    <input id="fee" type="number" min="0" max="100" step="0.01" placeholder="10">
+
+    <label for="sale">Precio de venta ($)</label>
+    <input id="sale" type="number" min="0" step="0.01" placeholder="15000">
+
+    <label for="target">Ganancia deseada (%) <span style="font-weight:400;color:#666">(opcional)</span></label>
+    <input id="target" type="number" min="0" step="0.01" placeholder="30">
+
+    <button onclick="calculate()">CALCULAR</button>
+
+    <div class="results" id="results" hidden>
+      <div class="row main"><span>Ganancia neta</span><span id="profit"></span></div>
+      <div class="row"><span>Margen</span><span id="margin"></span></div>
+      <div class="row"><span>Precio mínimo</span><span id="minimum"></span></div>
+      <div class="row" id="recommendedRow" hidden><span>Precio recomendado</span><span id="recommended"></span></div>
+      <p class="note">El precio mínimo cubre compra + gastos y la comisión indicada. El precio recomendado incorpora la ganancia deseada.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+function money(n){
+  return new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:2}).format(n);
+}
+function calculate(){
+  const buy=Number(document.getElementById('buy').value)||0;
+  const extra=Number(document.getElementById('extra').value)||0;
+  const fee=Number(document.getElementById('fee').value)||0;
+  const sale=Number(document.getElementById('sale').value)||0;
+  const target=Number(document.getElementById('target').value)||0;
+  const commission=sale*fee/100;
+  const profit=sale-buy-extra-commission;
+  const margin=sale>0 ? profit/sale*100 : 0;
+  const minimum=(buy+extra)/(1-fee/100);
+  const recommended=(buy+extra)/(1-fee/100-target/100);
+  document.getElementById('profit').textContent=money(profit);
+  document.getElementById('margin').textContent=margin.toFixed(2)+' %';
+  document.getElementById('minimum').textContent=money(minimum);
+  const recRow=document.getElementById('recommendedRow');
+  if(target>0 && fee<100 && target+fee<100){
+    document.getElementById('recommended').textContent=money(recommended);
+    recRow.hidden=false;
+  } else {
+    recRow.hidden=true;
+  }
+  document.getElementById('results').hidden=false;
+}
+</script>
+</body>
+</html>
